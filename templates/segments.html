@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actions par ségment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .table-compact {
+            width: fit-content; /* Ajuste la largeur selon le contenu */
+            margin: 0; /* Supprime les marges */
+            border-collapse: collapse; /* Évite les espaces entre les bordures */
+        }
+
+        .table-compact th, .table-compact td {
+            padding: 5px; /* Réduit l'espace à l'intérieur des cellules */
+            line-height: 1; /* Réduit la hauteur des lignes */
+            font-size: 14px; /* Ajuste la taille du texte pour correspondre */
+            text-align: left; /* Aligne le texte comme dans l'autre table */
+            vertical-align: middle; /* Centre le texte verticalement */
+        }
+
+        .table-container {
+            max-height: 150px; /* Permet d'afficher ~5 lignes */
+            overflow-y: auto; /* Active l'ascenseur */
+            border: 1px solid #ccc; /* Bordure optionnelle */
+            position: relative;
+            width: fit-content; /* Ajuste la largeur selon le contenu */
+            margin-left: 0; /* Colle la table à gauche */
+        }
+        .table-custom {
+            width: 50%; /* Ajuste la largeur de la table (modifiable) */
+            font-size: 14px; /* Réduit la taille du texte */
+            border-collapse: collapse; /* Réduit l'espacement des bordures */
+        }
+
+        .table-custom th, .table-custom td {
+            padding: 5px; /* Réduit l’espace dans les cellules */
+            line-height: 1; /* Réduit la hauteur des lignes */
+        }
+
+        /* Fixer l'entête du tableau */
+        .table-container thead {
+            position: sticky;
+            top: 0;
+            background-color: white; /* Fond blanc pour éviter qu'il se mélange avec le contenu */
+            z-index: 10;
+        }
+        table {
+            font-size: 12px; /* Réduction de la taille du texte */
+        }
+
+        th, td {
+            white-space: nowrap; /* Évite le retour à la ligne */
+            padding: 4px;
+        }
+
+        .hidden-row {
+            display: none; /* Cacher les lignes supplémentaires */
+        }
+        .card-header {
+            font-size: 14px; /* Réduction de la taille du titre */
+            padding: 6px;
+        }
+        h2 {
+            font-size: 18px; /* Taille du titre principal */
+        }
+        .div-compact {
+            width: fit-content; /* Ajuste la largeur selon le contenu */
+            margin: 0; /* Supprime les marges */
+            padding: 5px; /* Réduit l’espace intérieur */
+            display: inline-block; /* Évite que le div prenne toute la largeur */
+            border: 1px solid #ddd; /* Ajoute une bordure fine si nécessaire */
+        }
+    </style>
+</head>
+<div class="div-compact">
+<div class="container mt-3">
+    <h2 class="text-center">Liste des Actions par Segment</h2>
+
+    {% for seg, data in actions_par_seg.items %}
+    
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Segment : {{ data.libelle }} ( {{ data.se }} ) </h5>
+            </div>
+            <div class="card-body table-container">
+                {% if data.actions %}
+                    <div class="table-container" onscroll="loadMoreRows(this)">
+                        <table  class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Agence</th>
+                                    <th>N° Sous.</th>
+                                    <th>Client</th>
+                                    <th>NBA</th>
+                                    <th>Montant</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for action in data.actions %}
+                                    <tr class="table-row hidden-row">
+                                        <td>{{ action.age }}</td>
+                                        <td>{{ action.nsous }}</td>
+                                        <td>{{ action.cli }}</td>
+                                        <td>{{ action.nba }}</td>
+                                        <td>{{ action.mon }}</td>
+                                    </tr>
+                                {% endfor %}
+                                <tr class="table-info fw-bold">
+                                    <td colspan="2">TOTAL</td>
+                                    <td><strong>{{ data.total_cli }}</strong></td>
+                                    <td><strong>{{ data.total_nba }}</strong></td>
+                                    <td><strong>{{ data.total_mon|floatformat:2 }}</strong></td>
+                                </tr>
+                                <tr class="table-warning fw-bold">
+                                    <td colspan="6">Nombre d'agences distinctes : {{ data.total_agences }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Aucune action disponible pour ce segment.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+    
+</div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".table-container").forEach(container => {
+            let rows = container.querySelectorAll(".table-row");
+            rows.forEach((row, index) => {
+                if (index < 5) {
+                    row.classList.remove("hidden-row"); // Affiche les 5 premières lignes
+                }
+            });
+        });
+    });
+
+    function loadMoreRows(container) {
+        let rows = container.querySelectorAll(".table-row.hidden-row");
+        if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
+            for (let i = 0; i < 5 && rows.length > 0; i++) {
+                rows[0].classList.remove("hidden-row"); // Affiche 5 nouvelles lignes
+                rows = container.querySelectorAll(".table-row.hidden-row"); // Mise à jour
+            }
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
